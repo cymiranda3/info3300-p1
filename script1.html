@@ -1,0 +1,66 @@
+<head><script src="https://d3js.org/d3.v5.min.js"></script></head>
+<body>
+  <script>
+  let counts = [{'Type':'REG_LIC','count':0,}, {'Type':'TRAFFIC','count':0}, {'Type':'SPEED','count':0}
+        ,{'Type':'ALCOHOL','count':0}, {'Type':'VEH_CONDIT','count':0},{'Type':'HANDHELD','count':0},
+        {'Type':'PEDESTRIAN','count':0},{'Type':'OTHER','count':0}];
+    let offences = {};
+    let initial_counts = {'REG_LIC':0,'SPEED':0,'TRAFFIC':0,'ALCOHOL':0,'VEH_CONDIT':0,'HANDHELD':0,'PEDESTRIAN':0,'OTHER':0}
+    d3.csv("violations.csv")
+      .then(function(data) {
+        offences = data;
+        offences.forEach(function(d, i){
+          //Category 1: Registration or License related 
+          if(d["Description"].includes("LICENSE") || d["Description"].includes("LIC") || d["Description"].includes("REG")
+            || d["Description"].includes("SUSP")){
+            initial_counts['REG_LIC'] +=1;
+          }
+          //Category 2: Speeding related 
+          else if(d["Description"].includes("SPEED")){
+            initial_counts['SPEED'] +=1;
+          }
+          //Category 3: Traffic signal related 
+          else if(d["Description"].includes("TRAFFIC") || d["Description"].includes("raffic") || d["Description"].includes("STOP SIGN")
+            || d["Description"].includes("TURN SIGNAL") || d["Description"].includes("PARKING") || d["Description"].includes("RED") 
+            || d["Description"].includes("LANE") || d["Description"].includes("NEGLIGENT") || d["Description"].includes("RECKLESS") 
+            || d["Description"].includes("RED SIGNAL") || d["Description"].includes("PASSING") || d["Description"].includes("CLOSE")
+            || d["Description"].includes("TO STOP")
+              ){
+            initial_counts['TRAFFIC'] +=1;
+          }
+          //Category 4: Alcohol related 
+          else if(d["Description"].includes("ALCOHOL")){
+            initial_counts['ALCOHOL'] +=1;
+          }
+          //Category 5: Vehicle condition related
+          else if(d["Description"].includes("WINDOW") || d["Description"].includes("REFLECT") || d["Description"].includes("EXHAUST") || 
+            d["Description"].includes("GLASS") || d["Description"].includes("BUMP") || d["Description"].includes("MIRROR") ||
+            d["Description"].includes("TIRE") || d["Description"].includes("LIGHT") || d["Description"].includes("Lights") ||
+            d["Description"].includes("light")){
+            initial_counts['VEH_CONDIT'] +=1;
+          }
+          //Category 6: Handheld related  
+          else if(d["Description"].includes("HANDHELD") || d["Description"].includes("TELEPHONE") || d["Description"].includes("TEXT") 
+            || d["Description"].includes("SEATBELT") ){
+            initial_counts['HANDHELD'] +=1;
+          }
+          //Category 7: Pedestrian related 
+          else if(d["Description"].includes("PEDESTRIAN")){
+            initial_counts['PEDESTRIAN'] +=1;
+          }
+          //Category 8: Other
+          else {
+            initial_counts['OTHER'] +=1;
+          }
+          //Parking, Pedestrian, 
+          
+        });
+        counts.forEach(function(d,i){
+          d['count'] = initial_counts[d['Type']];
+        });
+        console.log(counts);
+      });
+
+        
+ </script>
+</body>

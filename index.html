@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Project 1</title>
+
+  <meta charset="UTF-8">
+  <script src="https://d3js.org/d3.v5.min.js"></script>
+  <style>
+  .mainTitle, .subTitle {
+    font-family:-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+    padding-left: 15px;
+    padding-bottom: 15px;
+  }
+
+  text, span, label {
+    font-family:-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+  }
+
+  svg {
+    background-color: #ecf0f1;
+    border-radius: 15px;
+  }
+  </style>
+</head>
+
+<body>
+
+  <h1 class="mainTitle">Traffic Violations in Montgomery County, MD</h1>
+
+  <div id="bar-chart">
+    <h2 class="subTitle">1. Frequency of Violations by Type</h2>
+
+    <svg class="canvas" width="800" height="700"></svg>
+
+    <script>
+
+    let canvas = d3.select(".canvas");
+    let legend_values = {'REG_LIC':'Registration and license-related issues','SPEED':'Speed-related issues','TRAFFIC':'Road traffic-related issues such as stop signs, red signals, etc.','ALCOHOL':'Alcohol-related issues','VEH_CONDIT':'Vehicle condition-related issues like headlights, mirrors, etc.','HANDHELD':'Handheld-related issues like texting while driving, etc.','PEDESTRIAN':'Pedestrian-related offences like jaywalking','OTHER':'All other offences in dataset'}
+    let counts = [{'Type':'REG_LIC','count':0,}, {'Type':'TRAFFIC','count':0}, {'Type':'SPEED','count':0}
+    ,{'Type':'ALCOHOL','count':0}, {'Type':'VEH_CONDIT','count':0},{'Type':'HANDHELD','count':0},
+    {'Type':'PEDESTRIAN','count':0},{'Type':'OTHER','count':0}];
+    let offences = {};
+    let initial_counts;
+    d3.json("freq_type.json")
+    .then(function(data) {
+      initial_counts = data;
+      console.log(initial_counts);
+
+      counts.forEach(function(d, i) {
+        d['count'] = initial_counts[d['Type']];
+      });
+
+      let y_scale = d3.scaleLinear().domain([0,350000]).range([600,50]);
+      // categories 1-8
+      let x_scale = d3.scaleLinear().domain([1,9]).range([100,750]);
+      let color_scale = d3.scaleOrdinal(d3.schemeCategory10);
+
+      let y_axis = d3.axisLeft()
+      .tickSize(2)
+      .tickPadding(10)
+      .scale(y_scale);
+      let x_axis = d3.axisBottom()
+      .tickSize(0)
+      .tickPadding(10)
+      .tickValues('') // Add text labels
+      .scale(x_scale);
+
+      canvas.append("g")
+      .attr("transform","translate(100,0)")
+      .call(y_axis);
+
+      canvas.append("g")
+      .attr("transform","translate(0,600)")
+      .call(x_axis);
+
+      canvas.append('text')
+      .attr('class','x_label')
+      .attr('x',300)
+      .attr('y',650)
+      .text('Violation Type')
+      .style("font-size","20px");
+
+      canvas.append('text')
+      .attr('x',700)
+      .attr('y',330)
+      .attr('class','y_label')
+      .style("transform", "rotate(-90deg)")
+      .style("font-size","20px")
+      .style("transform-origin","bottom")
+      .text('Number of Violations');
+      let container = d3.select("#bar-chart");
+
+      container.append('div')
+      .attr("class","legend")
+      .style("border-width","2px")
+      .style("border-style","solid")
+      .style("margin-left","150px")
+      .style("width","510px");
+
+      let legend = d3.select('.legend');
+
+      legend.append('label')
+      .style("display","block")
+      .style("font-weight","bold")
+      .text("LEGEND")
+      .style("margin-left","200px");
+
+      counts.forEach(function(d, i) {
+        console.log(d['Type']);
+        console.log(d['count'])
+        console.log('height',600-Number(y_scale(d['count'])));
+
+        canvas.append('rect')
+        .attr('x',x_scale(i+1))
+        .attr('y',y_scale(d['count']))
+        .attr('width',650/8)
+        .attr('height',600-Number(y_scale(d['count'])))
+        .style("fill",color_scale(d['Type']));
+
+        canvas.append('text')
+        .style("font-size","10px")
+        .style("margin-right","10px")
+        .attr('x',x_scale(i+1) + 10)
+        .attr('y',620)
+        .text(d['Type']);
+
+        legend.append('span')
+        .attr("class","legend_text")
+        .text(d['Type'] + " : " + legend_values[d['Type']])
+        .style("margin-right", "5px")
+        .style("margin-top", "5px")
+        .style("display", "block")
+        .style("margin-left", "10px")
+        .style("color", color_scale(d['Type']));
+      });
+    });
+    </script>
+  </div>
+
+  <div id="histogram">
+    <h2 class="subTitle">2. Violations by Hour of Day</h2>
+    <svg id="timeOfStop" width=1400 height=600></svg>
+
+    <script>
+    var hours = [];
+    for (let i = 0; i < 24; i++) {
+      hours[i] = 0;
+    }
+
+    let h;
+    d3.csv("violations.csv").then(function(data) {
+      data.forEach(function(d, i) {
+        h = parseInt(d['Time Of Stop'].substring(0, 2));
+        hours[h]++;
+      });
+
+      let svg = d3.select("svg#timeOfStop");
+      let width = svg.attr("width");
+      let height = svg.attr("height");
+
+      let margin = { "top": 30, "right": 30, "bottom": 50, "left": 100};
+      let histogramWidth = width - margin["left"] - margin.right;
+      let histogramHeight = height - margin["top"] - margin.bottom;
+
+      const xScale = d3.scaleLinear()
+      .domain([0, 23])
+      .range([0, histogramWidth]);
+
+      const yScale = d3.scaleLinear()
+      .domain([0, d3.max(hours)])
+      .range([histogramHeight, 0]);
+
+      let leftAxis = d3.axisLeft(yScale);
+      svg.append("g")
+      .attr("class", "y axis")
+      .attr("transform", "translate("+(margin.left-30)+", "+margin.top+")")
+      .call(leftAxis);
+
+      let bottomAxis = d3.axisBottom(xScale)
+      svg.append("g")
+      .attr("class", "x axis")
+      .attr("transform", "translate("+margin.left+", "+(histogramHeight+margin.top+10)+")")
+      .call(bottomAxis);
+
+      let histogram = svg.append("g")
+      .attr("transform", "translate("+margin.left+", "+margin.top+")");
+
+      for (let i = 0; i < hours.length; i++) {
+        histogram.append("line")
+        .attr("x1", xScale(i))
+        .attr("x2", xScale(i))
+        .attr("y1", histogramHeight + 10)
+        .attr("y2", yScale(hours[i]))
+        .style("stroke", "blue")
+        .style("stroke-width", 10);
+      }
+
+      for (let i = 0; i < hours.length; i++) {
+        histogram.append("text")
+        .attr("text-anchor", "middle")
+        .attr("font-size", "15px")
+        .attr("x", xScale(i))
+        .attr("y", yScale(hours[i]) - 10)
+        .text(hours[i])
+        .style("font-size", "13px");
+      }
+
+      svg.append("text").text("Hour of Day")
+      .attr("x", histogramWidth / 2 + 10)
+      .attr("y", histogramHeight + margin.bottom + 20)
+      .style("font-size", "15px");
+
+      svg.append("text")
+      .attr("x", 900)
+      .attr("y", -80)
+      .attr("class", "y_label")
+      .style("transform", "rotate(-90deg)")
+      .style("font-size", "15px")
+      .style("transform-origin", "bottom")
+      .text('Number of Violations');
+    });
+    </script>
+  </div>
+
+  <div id="bubble-chart">
+    <h2 class="subTitle">3. Violations by Car Color & Gender</h2>
+    <svg class="circles" width="1750" height="400"></svg>
+
+    <script>
+    // Select all of the circles in the svg
+    var svg_bubble = d3.select(".circles")
+
+    // Create an empty array to store the violation data in later.
+    var violations = [];
+    var colorCount = {};
+
+    // Pull in the data...
+    d3.json("colors.json")
+    .then(function(data) {
+      colorCount = data;
+      // Add all of the totals to totalList for sorting later
+      var totalList = [];
+      Object.keys(colorCount).forEach(function(k){
+        totalList.push(colorCount[k]['m']+colorCount[k]['f']);
+      });
+
+      // Find the max and min for the scale
+      var totalMax = d3.max(totalList);
+      var totalMin = d3.min(totalList);
+
+      // Construct the scale
+      var circleScale = d3.scaleSqrt()
+      .domain([totalMin, totalMax])
+      .range([0, 120]);
+
+      // Initial x location of the circles
+      var xLocation = 150;
+
+      // Sort total list
+      var sortedKeys = Object.keys(colorCount).sort(function(a, b) {
+        var aTotal = colorCount[a]['m']+colorCount[a]['f']
+        var bTotal = colorCount[b]['m']+colorCount[b]['f']
+        return bTotal-aTotal;
+      });
+
+      // Draw on the svg
+      console.log(colorCount)
+      sortedKeys.forEach(function(x){
+        var radius = circleScale(colorCount[x]['m']+colorCount[x]['f']);
+
+        var innerRadius = circleScale(Math.abs(colorCount[x]['f']))
+        if (radius > 35) {
+          svg_bubble.append("circle").attr("r", radius).attr("cx", xLocation).attr("cy", 200).attr("fill", colorCount[x]['primaryColor']).attr("opacity", 1.0);
+          svg_bubble.append("text").attr("x", xLocation).attr("dx", '-45px').attr("y", 350).style("font-size", '11px').attr("fill", colorCount[x]['secondaryColor']).text((colorCount[x]['m']+colorCount[x]['f']) + " Violations")
+          svg_bubble.append("text").attr("x", xLocation).attr("dx", '-25px').attr("y", 370).style("font-size", '11px').attr("fill", "blue").text(Math.round(100*colorCount[x]['m']/(colorCount[x]['f']+colorCount[x]['m'])) + "% Male")
+          svg_bubble.append("text").attr("x", xLocation).attr("dx", '-25px').attr("y", 390).style("font-size", '11px').attr("fill", "pink").text(Math.round(100*colorCount[x]['f']/(colorCount[x]['f']+colorCount[x]['m'])) + "% Female")
+
+          svg_bubble.append("text").attr("x", xLocation-radius).attr("y", 75).style("font-size", '16px')
+          .style("font-family", "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif")
+          .text(x);
+          var maleArc = d3.arc().innerRadius(radius).outerRadius(radius+(radius/10)).startAngle(0).endAngle((colorCount[x]['m']/(colorCount[x]['f']+colorCount[x]['m']))*360*(Math.PI/180))
+          var endAngle = (colorCount[x]['m']/(colorCount[x]['f']+colorCount[x]['m']))*360*(Math.PI/180)
+          var femaleArc = d3.arc().innerRadius(radius).outerRadius(radius + (radius/10)).startAngle(endAngle).endAngle(360*(Math.PI/180))
+
+          svg_bubble.append("path").attr("d", maleArc).attr("fill", "blue").attr("transform", "translate("+xLocation+", 200)")
+          svg_bubble.append("path").attr("d", femaleArc).attr("fill", "pink").attr("transform", "translate("+xLocation+", 200)")
+
+          xLocation += 20+2*circleScale(colorCount[x]['m']+colorCount[x]['f']);
+        }
+      });
+    })
+    </script>
+  </div>
+
+</body>
+</html>

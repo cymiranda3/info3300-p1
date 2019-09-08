@@ -1,0 +1,92 @@
+<head><script src="https://d3js.org/d3.v5.min.js"></script></head>
+
+<body>
+  <h2 id="mainTitle">Number of Violations by Car Color & Gender</h2>
+  <h3 id="subTitle">Montgomery County, MD</h3>
+  <svg class="circles" width="1750" height="400"></svg>
+
+  <script>
+    // Select all of the circles in the svg
+    var svg = d3.select(".circles")
+
+    // Transform the svg to allow for margin
+    svg.attr("transform", "translate(30, 20)")
+
+    // Create an empty array to store the violation data in later.
+    var violations = [];
+    var colorCount = {};
+
+    // Pull in the data...
+    d3.json("vis1.json")
+      .then(function(data) {
+        colorCount = data;
+        // Add all of the totals to totalList for sorting later
+        var totalList = [];
+        Object.keys(colorCount).forEach(function(k){
+          totalList.push(colorCount[k]['total']);
+        });
+
+        // Find the max and min for the scale
+        var totalMax = d3.max(totalList);
+        var totalMin = d3.min(totalList);
+
+        // Construct the scale
+        var circleScale = d3.scaleSqrt()
+          .domain([totalMin, totalMax])
+          .range([0, 120]);
+
+        // Initial x location of the circles
+        var xLocation = 150;
+
+        // Sort total list
+        var sortedKeys = Object.keys(colorCount).sort(function(a, b) {
+          return colorCount[b]['total']-colorCount[a]['total'];
+        });
+
+        // Draw on the svg
+        console.log(colorCount)
+        sortedKeys.forEach(function(x){
+          var radius = circleScale(colorCount[x]['total']);
+
+          var innerRadius = circleScale(Math.abs(colorCount[x]['total'] - colorCount[x]['m']))
+          if (radius > 35) {
+            svg.append("circle").attr("r", radius).attr("cx", xLocation).attr("cy", 200).attr("fill", colorCount[x]['primaryColor']).attr("opacity", 1.0);
+            svg.append("text").attr("x", xLocation).attr("dx", '-45px').attr("y", 350).style("font-size", '11px').attr("fill", colorCount[x]['secondaryColor']).text(colorCount[x]['total'] + " Violations")
+            svg.append("text").attr("x", xLocation).attr("dx", '-25px').attr("y", 370).style("font-size", '11px').attr("fill", "blue").text(Math.round(100*colorCount[x]['m']/(colorCount[x]['f']+colorCount[x]['m'])) + "% Male")
+            svg.append("text").attr("x", xLocation).attr("dx", '-25px').attr("y", 390).style("font-size", '11px').attr("fill", "pink").text(Math.round(100*colorCount[x]['f']/(colorCount[x]['f']+colorCount[x]['m'])) + "% Female")
+
+            svg.append("text").attr("x", xLocation-radius).attr("y", 75).style("font-size", '16px')
+              .style("font-family", "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif")
+              .text(x);
+            var maleArc = d3.arc().innerRadius(radius).outerRadius(radius+(radius/10)).startAngle(0).endAngle((colorCount[x]['m']/(colorCount[x]['f']+colorCount[x]['m']))*360*(Math.PI/180))
+            var endAngle = (colorCount[x]['m']/(colorCount[x]['f']+colorCount[x]['m']))*360*(Math.PI/180)
+            var femaleArc = d3.arc().innerRadius(radius).outerRadius(radius + (radius/10)).startAngle(endAngle).endAngle(360*(Math.PI/180))
+
+            svg.append("path").attr("d", maleArc).attr("fill", "blue").attr("transform", "translate("+xLocation+", 200)")
+            svg.append("path").attr("d", femaleArc).attr("fill", "pink").attr("transform", "translate("+xLocation+", 200)")
+
+            xLocation += 20+2*circleScale(colorCount[x]['total']);
+          }
+        });
+      })
+
+  </script>
+</body>
+
+<style>
+#mainTitle, #subTitle {
+  font-family:-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+  padding-left: 15px;
+  padding-bottom: 15px;
+}
+
+text {
+  font-family:-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+}
+
+svg {
+  background-color: #ecf0f1;
+  border-radius: 15px;
+}
+
+</style>

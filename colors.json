@@ -1,0 +1,137 @@
+{
+  "red": {
+    "total": 114855,
+    "m": 77506,
+    "f": 37218,
+    "primaryColor": "red",
+    "secondaryColor": "black"
+  },
+  "blue": {
+    "total": 157276,
+    "m": 102498,
+    "f": 54589,
+    "primaryColor": "#4b7bec",
+    "secondaryColor": "black"
+  },
+  "pink": {
+    "total": 205,
+    "m": 103,
+    "f": 102,
+    "primaryColor": "pink",
+    "secondaryColor": "black"
+  },
+  "yellow": {
+    "total": 5510,
+    "m": 4352,
+    "f": 1147,
+    "primaryColor": "yellow",
+    "secondaryColor": "black"
+  },
+  "gray": {
+    "total": 164228,
+    "m": 103693,
+    "f": 60346,
+    "primaryColor": "gray",
+    "secondaryColor": "black"
+  },
+  "white": {
+    "total": 227511,
+    "m": 162826,
+    "f": 64297,
+    "primaryColor": "white",
+    "secondaryColor": "black"
+  },
+  "black": {
+    "total": 297874,
+    "m": 203417,
+    "f": 94133,
+    "primaryColor": "black",
+    "secondaryColor": "black"
+  },
+  "silver": {
+    "total": 269282,
+    "m": 174061,
+    "f": 94974,
+    "primaryColor": "#a5b1c2",
+    "secondaryColor": "black"
+  },
+  "green": {
+    "total": 77327,
+    "m": 54393,
+    "f": 22821,
+    "primaryColor": "#20bf6b",
+    "secondaryColor": "black"
+  },
+  "tan": {
+    "total": 29637,
+    "m": 19390,
+    "f": 10228,
+    "primaryColor": "tan",
+    "secondaryColor": "black"
+  },
+  "gold": {
+    "total": 45520,
+    "m": 29878,
+    "f": 15558,
+    "primaryColor": "#f7b731",
+    "secondaryColor": "black"
+  },
+  "purple": {
+    "total": 2822,
+    "m": 1850,
+    "f": 968,
+    "primaryColor": "purple",
+    "secondaryColor": "black"
+  }
+  ,
+  "brown": {
+    "total": 6667,
+    "m": 4252,
+    "f": 2395,
+    "primaryColor": "brown",
+    "secondaryColor": "black"
+  }
+  ,
+  "beige": {
+    "total": 16620,
+    "m": 10788,
+    "f": 5826,
+    "primaryColor": "beige",
+    "secondaryColor": "black"
+  },
+  "maroon": {
+    "total": 24996,
+    "m": 16253,
+    "f": 8700,
+    "primaryColor": "maroon",
+    "secondaryColor": "black"
+  },
+  "orange": {
+    "total": 5195,
+    "m": 3681,
+    "f": 1497,
+    "primaryColor": "orange",
+    "secondaryColor": "black"
+  },
+  "bronze": {
+    "total": 3356,
+    "m": 2038,
+    "f": 1312,
+    "primaryColor": "bronze",
+    "secondaryColor": "black"
+  },
+  "cream": {
+    "total": 897,
+    "m": 488,
+    "f": 406,
+    "primaryColor": "cream",
+    "secondaryColor": "black"
+  },
+  "copper": {
+    "total": 457,
+    "m": 290,
+    "f": 167,
+    "primaryColor": "copper",
+    "secondaryColor": "black"
+  }
+}
